@@ -8,6 +8,7 @@
 
 ## Setup
 *The setup process is quite simple*
+1. Download the program from the [Releases Tab](https://github.com/eslam-allam/POE-stash-Auditor/releases) or clone the repo.
 1. Launch the application and you'll be redirected to the POE website to login and give consent.<br></br>
 __POE Stash Auditor will not gain access to anything but your StashTabs and items__
 
