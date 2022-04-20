@@ -35,8 +35,7 @@ apis = [
      f'https://poe.ninja/api/data/itemoverview?league={league}&type=UniqueWeapon',
      f'https://poe.ninja/api/data/itemoverview?league={league}&type=UniqueArmour',
      f'https://poe.ninja/api/data/itemoverview?league={league}&type=DivinationCard',
-     f'https://poe.ninja/api/data/itemoverview?league={league}&type=UniqueAccessory',
-     f'https://poe.ninja/api/data/itemoverview?league={league}&type=SkillGem',
+     f'https://poe.ninja/api/data/itemoverview?league={league}&type=UniqueAccessory'
 ]
 
 def get_leagues():
@@ -118,9 +117,11 @@ def get_token(token_file, expired= False):
 
 def get_stash_list(token, league):
     global expired
+    headers = ['id', 'name','metadata.colour', 'type']
     params = {'token':token, 'league':league}
     logging.info(f'REQUESTING STASH LIST FROM SERVER FROM LEAGUE: {league[0]}')
     response = requests.get('https://eslam-allam.herokuapp.com/requeststashlist', params=params)
+    
     if response.text == 'EXPIRED':
         logging.warning('TOKEN EXPIRED: REQUESTING REFRESH')
         token = get_token(token_file, expired=True)
@@ -136,24 +137,26 @@ def get_stash_list(token, league):
 
     if 'children' in response.columns:
         stash_list = response.loc[response['children'].isnull()]
-        stash_list = stash_list[['id', 'name','metadata.colour']]
+        stash_list = stash_list[headers]
         folders = response.loc[~response['children'].isnull()]
         folders = folders['children']
         for child in folders:
             if type(child) == list:
                 for c in child:
                     
-                    c =  pd.json_normalize(c)[['id', 'name','metadata.colour']]
+                    c =  pd.json_normalize(c)[headers]
                     stash_list = pd.concat([stash_list,c])
             else:
-                c =  pd.json_normalize(child)[['id', 'name','metadata.colour']]
+                c =  pd.json_normalize(child)[headers]
                 stash_list = pd.concat([stash_list,c])
     
     else:
-        stash_list = response[['id', 'name','metadata.colour']]
+        stash_list = response[headers]
     
-    stash_list.rename(columns={'metadata.colour':'colour'}, inplace=True)
-
+    
+    stash_list = stash_list.rename(columns={'metadata.colour':'colour'})
+    stash_list = stash_list.loc[stash_list['type'] != 'MapStash']
+    stash_list = stash_list.drop(columns=['type'])
     logging.info('PROCESSING FINISHED')
     return stash_list
 

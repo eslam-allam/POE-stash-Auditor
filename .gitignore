@@ -1,7 +1,7 @@
 
 *.pyc
 program_logs.log
-/sgui.build/
-/sgui.dist/
+/POE-Stash-Auditor.build/
+/POE-Stash-Auditor.dist/
 token.txt
 setupscript.iss
