@@ -20,7 +20,7 @@ __POE Stash Auditor will not gain access to anything but your StashTabs and item
 
 ## Images
 
-<img src="/consent-screen.jpg" alt="Concent Screen" width="200"/>
+<img src="/consent-screen.jpg" alt="Concent Screen" width="200" title="Consent Screen"/>
 
 ![Program without Console.](/program-without-console.jpg "Program without console")
 
