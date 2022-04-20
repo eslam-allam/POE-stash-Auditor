@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import numpy as np
 from subprocess import CREATE_NO_WINDOW
+import ast
 
 logging.getLogger('selenium').propagate = False
 mylogs = logging.getLogger('poe_auditor')
@@ -135,7 +136,6 @@ def get_token(token_file, expired= False):
 
 def get_stash_list(token, league):
     global expired
-    columns = ['id', 'index', 'metadata', 'name', 'parent', 'type']
     params = {'token':token, 'league':league}
     logging.info(f'REQUESTING STASH LIST FROM SERVER FROM LEAGUE: {league[0]}')
     response = requests.get('https://eslam-allam.herokuapp.com/requeststashlist', params=params)
@@ -146,28 +146,40 @@ def get_stash_list(token, league):
 
     logging.info('STASH LIST ACQUIRED - PROCESSING')
     response = response.json()
-    response = pd.json_normalize(response['stashes'])
+    response = pd.DataFrame(response['stashes'])
     stash_list = pd.DataFrame()
 
     for i, row in response.iterrows():
         if row['type'] == 'Folder':
             stash = pd.DataFrame(row['children'])
         else: 
-            stash_list = response
-            stash_list = stash_list[stash_list['type'] != 'MapStash']
-            stash_list = stash_list.rename(columns={'metadata.colour':'colour'})
-            continue
+            values = [str(x) for x in row.values]
+            keys = list(row.keys())
+            dict = {}
+            for i,key in enumerate(keys):
+                dict[key] = values[i]
 
-        #stash = stash[stash['type'] != 'MapStash']
-        stash = stash.loc[stash['type'] != 'MapStash']
-        stash = pd.concat([stash, stash["metadata"].apply(pd.Series)], axis=1)
+            stash = pd.DataFrame(dict, index=[0])
+
+
+        stash = stash[stash['type'] != 'MapStash']
+        colors_list = stash.loc[:,'metadata']
+        
+        colors = []
+
+        for color in colors_list:
+            color = ast.literal_eval(str(color))
+            x = color['colour']
+            colors.append(x)
+        
+        stash['colour'] = colors
         stash_list = [stash_list, stash]
         stash_list = pd.concat(stash_list, ignore_index=True)
 
     if stash_list.empty : 
         logging.warning('NO STASH FOR THIS LEAGUE')
         return  False
-    stash_list = stash_list.drop(['parent', 'metadata', 'public', 'index', 'metadata.map.series'], axis=1, errors='ignore')
+    stash_list = stash_list.drop(['parent', 'metadata', 'public', 'index'], axis=1, errors='ignore')
     logging.info('PROCESSING FINISHED')
     return stash_list
 

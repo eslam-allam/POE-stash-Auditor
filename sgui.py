@@ -88,8 +88,10 @@ while True:
                 continue
             stashes = stashesdf['name']
             colors = stashesdf['colour']
+            #print(colors)
             window['fac'].update(stashes)
             for i, color in enumerate(colors):
+                color = str(color)
                 if len(color) < 6:
                     zeroes = 6 - len(color)
                     color = color + '0'*zeroes
