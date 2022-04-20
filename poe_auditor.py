@@ -46,23 +46,6 @@ def get_leagues():
     response = response.json()
     return response
 
-def add_type(row):
-    if 'Essense' in row['baseType'] :
-        return 'Essense'
-    if 'Orb' in row['baseType'] or 'Shard' in row['baseType'] or 'Ember' in row['baseType'] or 'Sextant' in row['baseType'] or 'Ichor' in row['baseType']:
-        return 'Currency'
-    if 'Scarab' in row['baseType']:
-        return 'Scarab'
-    if 'Sacrifice' in row['baseType'] or 'Splinter' in row['baseType'] or 'Vessel' in row['baseType']:
-        return 'Fragment'
-    if 'Oil' in row['baseType']:
-        return 'Oil'
-    if 'Incubator' in row['baseType']:
-        return 'Incubator'
-    if 'Fossil' in row['baseType']:
-        return 'Fossil'
-    if 'Resonator' in row['baseType']:
-        return 'Resonator'
 
 def get_token(token_file, expired= False):
     global state
@@ -146,40 +129,32 @@ def get_stash_list(token, league):
 
     logging.info('STASH LIST ACQUIRED - PROCESSING')
     response = response.json()
-    response = pd.DataFrame(response['stashes'])
-    stash_list = pd.DataFrame()
-
-    for i, row in response.iterrows():
-        if row['type'] == 'Folder':
-            stash = pd.DataFrame(row['children'])
-        else: 
-            values = [str(x) for x in row.values]
-            keys = list(row.keys())
-            dict = {}
-            for i,key in enumerate(keys):
-                dict[key] = values[i]
-
-            stash = pd.DataFrame(dict, index=[0])
-
-
-        stash = stash[stash['type'] != 'MapStash']
-        colors_list = stash.loc[:,'metadata']
-        
-        colors = []
-
-        for color in colors_list:
-            color = ast.literal_eval(str(color))
-            x = color['colour']
-            colors.append(x)
-        
-        stash['colour'] = colors
-        stash_list = [stash_list, stash]
-        stash_list = pd.concat(stash_list, ignore_index=True)
-
-    if stash_list.empty : 
+    response = pd.json_normalize(response['stashes'])
+    
+    if response.empty : 
         logging.warning('NO STASH FOR THIS LEAGUE')
         return  False
-    stash_list = stash_list.drop(['parent', 'metadata', 'public', 'index'], axis=1, errors='ignore')
+
+    if 'children' in response.columns:
+        stash_list = response.loc[response['children'].isnull()]
+        stash_list = stash_list[['id', 'name','metadata.colour']]
+        folders = response.loc[~response['children'].isnull()]
+        folders = folders['children']
+        for child in folders:
+            if type(child) == list:
+                for c in child:
+                    
+                    c =  pd.json_normalize(c)[['id', 'name','metadata.colour']]
+                    stash_list = pd.concat([stash_list,c])
+            else:
+                c =  pd.json_normalize(child)[['id', 'name','metadata.colour']]
+                stash_list = pd.concat([stash_list,c])
+    
+    else:
+        stash_list = response[['id', 'name','metadata.colour']]
+    
+    stash_list.rename(columns={'metadata.colour':'colour'}, inplace=True)
+
     logging.info('PROCESSING FINISHED')
     return stash_list
 
