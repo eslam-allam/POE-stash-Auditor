@@ -33,7 +33,7 @@ ch = Handler()
 mylogs.addHandler(ch)
 
 
-
+leagues = list(poe_auditor.get_leagues().values())
 stashes = []
 token = ''
 prices = None
@@ -55,7 +55,7 @@ sg.theme('DarkBlue')   # Add a touch of color
 # All the stuff inside your window.
 layout = [  [sg.Button('Get Token',expand_x=True), sg.Button('Show/Hide console',expand_x=True)],
             [sg.Text('League: ', font=('font', 15, 'bold'))],
-            [sg.Listbox(['Archnemesis', 'Blight'], default_values='Archnemesis', size=(100,4), enable_events=False, key='_LIST_', font=('font', 10,'roman'), expand_x=True)],
+            [sg.Listbox(leagues, default_values='Archnemesis', size=(100,4), enable_events=False, key='_LIST_', font=('font', 10,'roman'), expand_x=True)],
             [sg.Button('Ok', expand_x=True), sg.Button('Exit', expand_x=True)],
             [sg.Listbox(values=stashes, select_mode='extended', key='fac', size=(30, 6),expand_x=True, font=('Verdana', 11,'normal'))], 
             [sg.Button('Get Prices', auto_size_button=True) , sg.Text('Threshold: '),sg.InputText()],
@@ -83,6 +83,8 @@ while True:
             stashesdf = poe_auditor.get_stash_list(token, selected)
             if type(stashesdf) == str: 
                 token = stashesdf
+                continue
+            if type(stashesdf) == bool:
                 continue
             stashes = stashesdf['name']
             colors = stashesdf['colour']

@@ -39,6 +39,11 @@ apis = [
      f'https://poe.ninja/api/data/itemoverview?league={league}&type=SkillGem',
 ]
 
+def get_leagues():
+    url = 'https://eslam-allam.herokuapp.com/poegetleagues'
+    response = requests.get(url)
+    response = response.json()
+    return response
 
 def add_type(row):
     if 'Essense' in row['baseType'] :
@@ -130,6 +135,7 @@ def get_token(token_file, expired= False):
 
 def get_stash_list(token, league):
     global expired
+    columns = ['id', 'index', 'metadata', 'name', 'parent', 'type']
     params = {'token':token, 'league':league}
     logging.info(f'REQUESTING STASH LIST FROM SERVER FROM LEAGUE: {league[0]}')
     response = requests.get('https://eslam-allam.herokuapp.com/requeststashlist', params=params)
@@ -147,14 +153,21 @@ def get_stash_list(token, league):
         if row['type'] == 'Folder':
             stash = pd.DataFrame(row['children'])
         else: 
-            stash = pd.DataFrame(row)
-        
-        stash = stash[stash.type != 'MapStash']
+            stash_list = response
+            stash_list = stash_list[stash_list['type'] != 'MapStash']
+            stash_list = stash_list.rename(columns={'metadata.colour':'colour'})
+            continue
+
+        #stash = stash[stash['type'] != 'MapStash']
+        stash = stash.loc[stash['type'] != 'MapStash']
         stash = pd.concat([stash, stash["metadata"].apply(pd.Series)], axis=1)
         stash_list = [stash_list, stash]
         stash_list = pd.concat(stash_list, ignore_index=True)
 
-    stash_list.drop(['parent', 'metadata', 'public', 'index'], axis=1, inplace=True)
+    if stash_list.empty : 
+        logging.warning('NO STASH FOR THIS LEAGUE')
+        return  False
+    stash_list = stash_list.drop(['parent', 'metadata', 'public', 'index', 'metadata.map.series'], axis=1, errors='ignore')
     logging.info('PROCESSING FINISHED')
     return stash_list
 
