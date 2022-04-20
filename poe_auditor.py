@@ -11,7 +11,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import numpy as np
 from subprocess import CREATE_NO_WINDOW
-import ast
 
 logging.getLogger('selenium').propagate = False
 mylogs = logging.getLogger('poe_auditor')
