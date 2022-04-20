@@ -16,6 +16,8 @@ logging.getLogger('selenium').propagate = False
 mylogs = logging.getLogger('poe_auditor')
 mylogs.addHandler(logging.NullHandler())
 
+token = ''
+state = ''
 token_file = './token.txt'
 league = 'Archnemesis'
 
@@ -56,8 +58,8 @@ def add_type(row):
     if 'Resonator' in row['baseType']:
         return 'Resonator'
 
-def get_token(token_file, expired = False):
-    
+def get_token(token_file, expired= False):
+    global state
     service = Service('./chromedriver.exe')
     service.creationflags = CREATE_NO_WINDOW
     if expired:
@@ -69,7 +71,9 @@ def get_token(token_file, expired = False):
             
             driver.get('https://eslam-allam.herokuapp.com/poerequesttoken{}'.format(state))
             WebDriverWait(driver, timeout=900).until(EC.text_to_be_present_in_element((By.ID, 'recieved'),'TOKEN ADDED TO DATABASE'))
-        except:
+            driver.quit()
+        except Exception as e:
+            mylogs.warning(e)
             mylogs.warning('FAILED TO RETRIEVE TOKEN')
             return False
     
@@ -84,6 +88,7 @@ def get_token(token_file, expired = False):
         with open(token_file, 'w+') as f:
             f.write('{}:{}'.format(state,token))
             mylogs.info('TOKEN SAVED SUCCESSFULLY')
+        expired = False
         return token
 
     exists = os.path.exists(token_file)
@@ -98,6 +103,7 @@ def get_token(token_file, expired = False):
             
             driver.get('https://eslam-allam.herokuapp.com/poerequesttoken{}'.format(state))
             WebDriverWait(driver, timeout=900).until(EC.text_to_be_present_in_element((By.ID, 'recieved'),'TOKEN ADDED TO DATABASE'))
+            driver.quit()
         except:
             mylogs.warning('FAILED TO RETRIEVE TOKEN')
             return False
@@ -120,15 +126,18 @@ def get_token(token_file, expired = False):
             mylogs.info('TOKEN IMPORTED')
     return token
 
+
+
+
 def get_stash_list(token, league):
+    global expired
     params = {'token':token, 'league':league}
     logging.info(f'REQUESTING STASH LIST FROM SERVER FROM LEAGUE: {league[0]}')
     response = requests.get('https://eslam-allam.herokuapp.com/requeststashlist', params=params)
-
-    if response == 'EXPIRED':
+    if response.text == 'EXPIRED':
         logging.warning('TOKEN EXPIRED: REQUESTING REFRESH')
-        get_token(token_file, expired=True)
-        return False
+        token = get_token(token_file, expired=True)
+        return token
 
     logging.info('STASH LIST ACQUIRED - PROCESSING')
     response = response.json()

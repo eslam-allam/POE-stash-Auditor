@@ -4,3 +4,4 @@ program_logs.log
 /sgui.build/
 /sgui.dist/
 token.txt
+setupscript.iss

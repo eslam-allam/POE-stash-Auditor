@@ -81,6 +81,9 @@ while True:
 
             selected = values['_LIST_']
             stashesdf = poe_auditor.get_stash_list(token, selected)
+            if type(stashesdf) == str: 
+                token = stashesdf
+                continue
             stashes = stashesdf['name']
             colors = stashesdf['colour']
             window['fac'].update(stashes)
