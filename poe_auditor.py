@@ -73,7 +73,6 @@ def get_token(token_file, expired= False):
             WebDriverWait(driver, timeout=900).until(EC.text_to_be_present_in_element((By.ID, 'recieved'),'TOKEN ADDED TO DATABASE'))
             driver.quit()
         except Exception as e:
-            mylogs.warning(e)
             mylogs.warning('FAILED TO RETRIEVE TOKEN')
             return False
     
