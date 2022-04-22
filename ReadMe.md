@@ -38,10 +38,10 @@ __POE Stash Auditor will not gain access to anything but your StashTabs and item
 ______
 ## To do list:
 
-- [] Linux compatability
-- [] Improve performance by switching to numpy of cython.
-- [] Add support for rare(yellow) items
-- [] Upgrade hosting server
+- [ ] Linux compatability
+- [ ] Improve performance by switching to numpy of cython.
+- [ ] Add support for rare(yellow) items
+- [ ] Upgrade hosting server
 
 ____
 
