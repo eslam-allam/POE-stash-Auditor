@@ -44,67 +44,50 @@ def get_leagues():
     response = response.json()
     return response
 
+def poe_login(state):
+    service = Service('./chromedriver.exe')
+    service.creationflags = CREATE_NO_WINDOW
+    chrome_options = Options()
+    chrome_options.add_argument("--log-level=3")
+    chrome_options.add_argument("--disable-extensions")
+
+    try:
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        driver.get('https://eslam-allam.herokuapp.com/poerequesttoken{}'.format(state))
+        WebDriverWait(driver, timeout=900).until(EC.text_to_be_present_in_element((By.ID, 'recieved'),'TOKEN ADDED TO DATABASE'))
+        driver.quit()
+    except Exception as e:
+        mylogs.warning('FAILED TO RETRIEVE TOKEN')
+        return False
+
+
+    
+    # Make the tests...
+    response = requests.get('https://eslam-allam.herokuapp.com/tokendelivery{}'.format(state))
+    response = response.text
+    token = response
+    
+
+    with open(token_file, 'w+') as f:
+        f.write('{}:{}'.format(state,token))
+        mylogs.info('TOKEN SAVED SUCCESSFULLY')
+    
+    del driver, service, chrome_options
+    return token
 
 def get_token(token_file, expired= False):
     global state
-    service = Service('./chromedriver.exe')
-    service.creationflags = CREATE_NO_WINDOW
+    token = ''
     if expired:
-        chrome_options = Options()
-        chrome_options.add_argument("--log-level=3")
-
-        try:
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            
-            driver.get('https://eslam-allam.herokuapp.com/poerequesttoken{}'.format(state))
-            WebDriverWait(driver, timeout=900).until(EC.text_to_be_present_in_element((By.ID, 'recieved'),'TOKEN ADDED TO DATABASE'))
-            driver.quit()
-        except Exception as e:
-            mylogs.warning('FAILED TO RETRIEVE TOKEN')
-            return False
-    
-
-        
-        # Make the tests...
-        response = requests.get('https://eslam-allam.herokuapp.com/tokendelivery{}'.format(state))
-        response = response.text
-        token = response
-        
-
-        with open(token_file, 'w+') as f:
-            f.write('{}:{}'.format(state,token))
-            mylogs.info('TOKEN SAVED SUCCESSFULLY')
-        expired = False
+        token = poe_login(state)
         return token
 
     exists = os.path.exists(token_file)
     if not exists:
         mylogs.warning('TOKEN NOT FOUND! REQUESTING ACCESS TOKEN')
         state = token_urlsafe(16)
-        chrome_options = Options()
-        chrome_options.add_argument("--log-level=3")
-
-        try:
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            
-            driver.get('https://eslam-allam.herokuapp.com/poerequesttoken{}'.format(state))
-            WebDriverWait(driver, timeout=900).until(EC.text_to_be_present_in_element((By.ID, 'recieved'),'TOKEN ADDED TO DATABASE'))
-            driver.quit()
-        except:
-            mylogs.warning('FAILED TO RETRIEVE TOKEN')
-            return False
-    
-
-        
-        # Make the tests...
-        response = requests.get('https://eslam-allam.herokuapp.com/tokendelivery{}'.format(state))
-        response = response.text
-        token = response
-        
-
-        with open(token_file, 'w+') as f:
-            f.write('{}:{}'.format(state,token))
-            mylogs.info('TOKEN SAVED SUCCESSFULLY')
+        token = poe_login(state)
     else:
         with open(token_file, 'r') as f:
             mylogs.info('TOKEN FILE FOUND. IMPORTING TOKEN')
@@ -116,7 +99,6 @@ def get_token(token_file, expired= False):
 
 
 def get_stash_list(token, league):
-    global expired
     headers = ['id', 'name','metadata.colour', 'type']
     params = {'token':token, 'league':league}
     logging.info(f'REQUESTING STASH LIST FROM SERVER FROM LEAGUE: {league[0]}')
@@ -149,7 +131,7 @@ def get_stash_list(token, league):
             else:
                 c =  pd.json_normalize(child)[headers]
                 stash_list = pd.concat([stash_list,c])
-    
+        del folders
     else:
         stash_list = response[headers]
     
@@ -158,6 +140,8 @@ def get_stash_list(token, league):
     stash_list = stash_list.loc[stash_list['type'] != 'MapStash']
     stash_list = stash_list.drop(columns=['type'])
     logging.info('PROCESSING FINISHED')
+
+    del response, headers, params
     return stash_list
 
 def get_stash_items(token, league, stash_id):
@@ -186,6 +170,7 @@ def get_stash_items(token, league, stash_id):
         response2['stackSize'] = 1
         response = response2
         response['baseType'] = np.where(~(response['name'] == ''),response['name'],response['baseType'])
+        del response2
 
     response.pop('name')
 
@@ -208,6 +193,8 @@ def get_stash_items(token, league, stash_id):
         logging.warning('FETCHED EMPTY TABLE')
         return False
     logging.info('PROCESSING FINISHED')
+
+    del params, duplicates, dup_count
     return response
 
 def get_all_prices():
@@ -230,6 +217,8 @@ def get_all_prices():
 
     
     logging.info('PRICES UPDATED - DONE')
+
+    del price
     return prices
 
 def get_stash_prices(stash,prices, threshold=False):
@@ -253,6 +242,8 @@ def get_stash_prices(stash,prices, threshold=False):
         spreadsheet.sort_values('Total_value',ascending=False, inplace=True, ignore_index=True)
     
     logging.info('PRICES MATCHED - DONE')
+
+    del value, total_value, new_row
     return spreadsheet
 
 # %%

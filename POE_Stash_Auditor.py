@@ -3,7 +3,7 @@ import poe_auditor
 import logging
 import pandas as pd
 import traceback
-import os
+
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S', handlers=[])
@@ -37,7 +37,7 @@ leagues = list(poe_auditor.get_leagues().values())
 stashes = []
 token = ''
 prices = None
-stashesdf= pd.DataFrame()
+stashesdf= None
 selected = ''
 console = False
 
@@ -87,7 +87,6 @@ while True:
             prices = poe_auditor.get_all_prices()
             stashes = stashesdf['name']
             colors = stashesdf['colour']
-            #print(colors)
             window['fac'].update(stashes)
             for i, color in enumerate(colors):
                 color = str(color)
