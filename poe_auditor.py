@@ -39,9 +39,11 @@ apis = [
 ]
 
 def get_leagues():
+    logging.info('IMPORTING LEAGUE LIST')
     url = 'https://eslam-allam.herokuapp.com/poegetleagues'
     response = requests.get(url)
     response = response.json()
+    logging.info('LEAGUE LIST IMPORTED')
     return response
 
 def poe_login(state):

@@ -18,6 +18,8 @@ __POE Stash Auditor will not gain access to anything but your StashTabs and item
 
 *If you wish to view the console to see some helpful debugging/progress messages you may click the __Show/Hide Console__ button*
 
+<p style="color:red;font-family:verdana;font-size:150%">Please note that Chrome is required for the consent process.</p>
+
 
 ## Images
 
