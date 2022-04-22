@@ -18,7 +18,7 @@ __POE Stash Auditor will not gain access to anything but your StashTabs and item
 
 *If you wish to view the console to see some helpful debugging/progress messages you may click the __Show/Hide Console__ button*
 
-<p style="color:red;font-family:verdana;font-size:150%">Please note that Chrome is required for the consent process.</p>
+**Please note that Chrome is required for the consent process.**
 
 
 ## Images
@@ -34,6 +34,14 @@ __POE Stash Auditor will not gain access to anything but your StashTabs and item
 *Program with console:*
 
 <img src="/program-with-console.jpg" alt="Program with Console." width="400" title="Program with Console"/>
+
+______
+## To do list:
+
+- [] Linux compatability
+- [] Improve performance by switching to numpy of cython.
+- [] Add support for rare(yellow) items
+- [] Upgrade hosting server
 
 ____
 
