@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import numpy as np
 from subprocess import CREATE_NO_WINDOW
+from sys import platform
 
 logging.getLogger('selenium').propagate = False
 mylogs = logging.getLogger('poe_auditor')
@@ -47,7 +48,13 @@ def get_leagues():
     return response
 
 def poe_login(state):
-    service = Service('./chromedriver.exe')
+    driver = './drivers/'
+    if platform == 'linux':
+        driver += 'chromedriver-linux'
+    elif platform == 'win32':
+        driver += 'chromedriver-win.exe'
+
+    service = Service(driver)
     service.creationflags = CREATE_NO_WINDOW
     chrome_options = Options()
     chrome_options.add_argument("--log-level=3")
