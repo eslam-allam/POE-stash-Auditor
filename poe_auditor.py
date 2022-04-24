@@ -17,6 +17,11 @@ logging.getLogger('selenium').propagate = False
 mylogs = logging.getLogger('poe_auditor')
 mylogs.addHandler(logging.NullHandler())
 
+os.environ['WDM_LOCAL'] = '1'
+os.environ['WDM_LOG'] = '0'
+
+
+
 token = ''
 state = ''
 token_file = './token.txt'
@@ -49,7 +54,7 @@ def get_leagues():
 
 def poe_login(state):
 
-    service = Service(executable_path=ChromeDriverManager().install())
+    service = Service(executable_path=ChromeDriverManager(log_level=0).install())
     if platform == 'win32': 
         from subprocess import CREATE_NO_WINDOW
         service.creationflags = CREATE_NO_WINDOW
@@ -252,4 +257,3 @@ def get_stash_prices(stash,prices, threshold=False):
     del value, total_value, new_row
     return spreadsheet
 
-# %%

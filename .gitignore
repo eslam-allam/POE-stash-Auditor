@@ -4,5 +4,6 @@ program_logs.log
 /POE-Stash-Auditor.build/
 /POE-Stash-Auditor.dist/
 token.txt
+/.wdm/
 setupscript.iss
 /linux-env/
