@@ -1,8 +1,6 @@
-from glob import glob
 import PySimpleGUI as sg
 import poe_auditor
 import logging
-import pandas as pd
 import traceback
 import threading
 import multiprocessing
@@ -79,14 +77,13 @@ def gui(lock):
                 [sg.Listbox(values=stashes, select_mode='extended', key='fac', size=(30, 6),expand_x=True, font=('Verdana', 11,'normal'))], 
                 [sg.Button('Get Prices', auto_size_button=True) , sg.Text('Threshold: '),sg.InputText()],
                 [table],
-                [sg.Multiline(size=(100,6), key='log', expand_x=True, visible=console, autoscroll=True, auto_refresh=True, disabled=True)] ]
+                [sg.pin(sg.Multiline(size=(100,6), key='log', expand_x=True, visible=console, autoscroll=True, auto_refresh=True, disabled=True), expand_x=True)] ]
 
     # Create the Window
     window = sg.Window('POE Stash Auditor', layout, finalize=True, icon='./poeauditor.ico')
     t = threading.Thread(target=get_token_leagues, args=(window, token_file, lock))
     t.start()
     threads.append(t)
-    #token = poe_auditor.get_token(token_file)
 
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
@@ -99,25 +96,17 @@ def gui(lock):
                 token = poe_auditor.get_token(token_file)
             if event == 'Ok':
                 selected = values['_LIST_']
-                '''t = threading.Thread(target=ok, args=(window, selected, change_color, lock))
-                t.start()
-                threads.append(t)'''
                 ok(window, selected, change_color, lock)
             
             if event == 'Get Prices':
-                '''t = threading.Thread(target=get_prices, args=(window,values, selected, stashesdf))
-                t.start()
-                threads.append(t)'''
                 get_prices(window, values, selected, stashesdf)
 
             if event == 'Show/Hide console':
                 if console:
                     window['log'].update(visible= False)
-                    window['log'].hide_row()
                     console = False
                 else:
                     window['log'].update(visible= True)
-                    window['log'].unhide_row()
                     console = True
         except Exception as e:
             logging.error(traceback.format_exc())

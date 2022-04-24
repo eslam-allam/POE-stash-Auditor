@@ -21,6 +21,9 @@ token = ''
 state = ''
 token_file = './token.txt'
 league = 'Archnemesis'
+os.environ['WDM_LOG'] = '0'
+os.environ['WDM_LOCAL'] = '1'
+
 
 apis = [
      f'https://poe.ninja/api/data/currencyoverview?league={league}&type=Currency',

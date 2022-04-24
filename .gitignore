@@ -6,3 +6,4 @@ program_logs.log
 token.txt
 setupscript.iss
 /linux-env/
+/.wdm/
