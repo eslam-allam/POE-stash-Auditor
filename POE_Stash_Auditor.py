@@ -82,7 +82,7 @@ def gui(lock):
                 [sg.Multiline(size=(100,6), key='log', expand_x=True, visible=console, autoscroll=True, auto_refresh=True, disabled=True)] ]
 
     # Create the Window
-    window = sg.Window('POE Stash Auditor', layout, finalize=True)
+    window = sg.Window('POE Stash Auditor', layout, finalize=True, icon='./poeauditor.ico')
     t = threading.Thread(target=get_token_leagues, args=(window, token_file, lock))
     t.start()
     threads.append(t)
