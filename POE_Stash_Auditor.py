@@ -32,6 +32,7 @@ def gui(lock):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S', handlers=[])
     
     logging.getLogger('selenium').propagate = False
+    logging.getLogger('webdriver_manager').propagate = False
     mylogs = logging.getLogger()
 
     file = logging.FileHandler("program_logs.log",encoding='utf-8')
