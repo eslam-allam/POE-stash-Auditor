@@ -1,10 +1,12 @@
 
 *.pyc
 program_logs.log
-/POE-Stash-Auditor.build/
-/POE-Stash-Auditor.dist/
+/POE_Stash_Auditor.build/
+/POE_Stash_Auditor.dist/
 token.txt
 /.wdm/
 setupscript.iss
 /linux-env/
 /.wdm/
+
+LINUX-program/POE_Stash_Auditor.bin
