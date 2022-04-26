@@ -38,11 +38,13 @@ __POE Stash Auditor will not gain access to anything but your StashTabs and item
 ______
 ## To do list:
 
-- [ ] Linux compatability
+- [x] Linux compatability
 - [ ] Improve performance by switching to numpy of cython.
 - [ ] Add support for rare(yellow) items
 - [ ] Upgrade hosting server
 
 ____
+## Notes:
+- __Linux release is currently more up to date than the windows release.__
 
 ## This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
